@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     const password2 = password;
     try {
       const response = await axios.post(
-        `http://${AuthAPI}/api/auth/register/`,
+        `http://${AUTHAPI}/api/auth/register/`,
         {
           username,
           first_name: firstName,
@@ -94,6 +94,95 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Registration error:", error);
       throw new Error("Registration failed");
+    }
+  };
+  const createField = async (
+    city,
+    region,
+    district,
+    landUsage,
+    cadastre,
+    area,
+    totalArea,
+    user,
+    token
+  ) => {
+    const region_district = district; // It's not clear why you need this variable, but it's passed.
+
+    try {
+      const response = await axios.post(
+        `http://${AUTHAPI}/api/create/`,
+        {
+          city,
+          region,
+          city_district: district,
+          ownership: landUsage,
+          cadastral_number: cadastre,
+          used_area: area,
+          total_area: totalArea,
+          user,
+          region_district,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the header
+          },
+        }
+      );
+
+      // If the API response contains an access token, store it and update authState
+      if (response.data.access) {
+        await AsyncStorage.setItem("useraccess", response.data.access); // Store the access token in AsyncStorage
+        setAuthState({ access: response.data.access }); // Update the auth state with the new access token
+      }
+    } catch (error) {
+      console.error("Field creation error:", error);
+      throw new Error("Field creation failed"); // Rethrow error if API request fails
+    }
+  };
+
+  const createProduct = async (
+    family,
+    culture,
+    sort,
+    fraction,
+    field,
+    token
+  ) => {
+    try {
+      // Sending the POST request to create the product
+      const response = await axios.post(
+        `http://${AUTHAPI}/api/product/`,
+        {
+          family,
+          type: culture,
+          sort,
+          fraction,
+          field,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the header
+          },
+        }
+      );
+
+      // Check if the response contains an access token and update auth state if necessary
+      if (response.data.access) {
+        await AsyncStorage.setItem("useraccess", response.data.access); // Store the access token in AsyncStorage
+        setAuthState({ access: response.data.access }); // Update the auth state with the new access token
+      }
+
+      // Handle successful product creation, possibly return data or trigger further actions
+      console.log("Product created successfully:", response.data);
+      return response.data; // Optionally return response data if needed in the calling component
+    } catch (error) {
+      console.error("Product creation error:", error);
+      Alert.alert(
+        "Error",
+        "There was an issue creating the product. Please try again."
+      ); // Show a user-friendly error message
+      throw new Error("Product creation failed"); // Rethrow error if API request fails
     }
   };
 
@@ -130,7 +219,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ authState, login, logout, register, getAuthToken }}
+      value={{
+        authState,
+        login,
+        logout,
+        register,
+        getAuthToken,
+        createField,
+        createProduct,
+      }}
     >
       {children}
     </AuthContext.Provider>

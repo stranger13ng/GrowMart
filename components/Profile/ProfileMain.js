@@ -9,22 +9,23 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+
 import IMAGES from "../../Assets";
 import RgbaColors from "../../RgbaColors";
 import { useAuth } from "../../app/context/AuthContext";
 import { fetchUserProfile } from "../../src/services/UserProfileService";
-import { useNavigation } from "@react-navigation/native"; // Navigation hook
+import { useNavigation } from "@react-navigation/native";
 
 const ProfileMain = () => {
   const { logout, getAuthToken } = useAuth();
   const [profile, setProfile] = useState([]);
   const screenWidth = Dimensions.get("window").width;
-  const navigation = useNavigation(); // Initialize navigation
+  const navigation = useNavigation();
 
   const getUserProfile = async () => {
     try {
       const token = await getAuthToken(); // Get the token from AuthContext
-      const fetchedProfile = await fetchUserProfile(token); // Fetch profile data
+      const fetchedProfile = await fetchUserProfile(token); // Call the service to fetch the profile
       console.log(fetchedProfile);
       setProfile(fetchedProfile);
     } catch (error) {
@@ -35,7 +36,7 @@ const ProfileMain = () => {
 
   useEffect(() => {
     getUserProfile();
-  }, []); // Empty dependency array to fetch data once
+  }, []); // Empty dependency array to run only once when the component mounts
 
   return (
     <ScrollView
@@ -47,10 +48,11 @@ const ProfileMain = () => {
         paddingTop: Platform.OS === "ios" ? 10 : 5,
       }}
     >
+      {/* Fix: Ensure you return the JSX from the map */}
       {profile.map((user, index) => {
         return (
           <View
-            key={index} // Add a key for each profile in the map
+            key={index} // Add a key for each item in the list
             style={{
               flex: 1,
               marginHorizontal: 20,
@@ -143,7 +145,7 @@ const ProfileMain = () => {
                         paddingHorizontal: 20,
                         paddingVertical: 10,
                       }}
-                      onPress={() => navigation.navigate("FarmField")} // Navigate to Details screen
+                      onPress={() => navigation.navigate("FarmField", { user })}
                     >
                       <Text
                         style={{
@@ -231,6 +233,36 @@ const ProfileMain = () => {
               >
                 <Image
                   source={IMAGES.EMPTYPRODUCTS}
+                  resizeMode="contain"
+                  style={{
+                    width: screenWidth,
+                    height: (screenWidth / 375) * 137,
+                  }}
+                />
+              </View>
+            </View>
+            <View>
+              <View style={{ flex: 1, margin: 10 }}>
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: 12,
+                    fontWeight: 700,
+                  }}
+                >
+                  Все товары
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  marginBottom: 15,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={IMAGES.INFOPANELFOOTER}
                   resizeMode="contain"
                   style={{
                     width: screenWidth,

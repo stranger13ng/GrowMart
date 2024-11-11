@@ -1,15 +1,23 @@
-// AuthComponent.js
-
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, View, Platform } from "react-native";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  View,
+  Platform,
+  ScrollView,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TouchableHighlight } from "react-native";
 import { useAuth } from "../../app/context/AuthContext"; // Import the useAuth hook
 import LogoComponent from "./LogoComponent";
 import Login from "./Login/Login";
 import Registration from "./Registration/Registration";
 import RgbaColors from "../../RgbaColors";
 import { Tab } from "./Tab";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AuthComponent = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -78,38 +86,51 @@ const AuthComponent = () => {
   const TabItems = [{ label: "Войти" }, { label: "Регистрация" }];
 
   return (
-    <SafeAreaView style={styles.body}>
-      <LogoComponent />
-      <View style={styles.auth_container}>
-        {/* Tab for Login and Registration */}
-        <Tab
-          data={TabItems}
-          selectedIndex={selectedIndex}
-          onChange={setSelectedIndex}
-        />
+    <KeyboardAwareScrollView
+      style={styles.body}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 150 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      {/* Wrap everything inside TouchableWithoutFeedback to dismiss the keyboard when tapping outside */}
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View
+          // decelerationRate={Platform.OS === "ios" ? 0.99 : "fast"}
+          style={styles.scrollViewContent}
+        >
+          <LogoComponent />
 
-        {selectedIndex === 0 ? (
-          <Login
-            onChangeText={setUsername}
-            onChangePassword={setPassword}
-            onLogin={handleLogin}
-            loading={loading}
-          />
-        ) : (
-          <Registration
-            onChangeText={(field, value) => {
-              if (field === "firstName") setFirstName(value);
-              else if (field === "lastName") setLastName(value);
-              else if (field === "username") setUsername(value);
-              else if (field === "companyName") setCompanyName(value);
-            }}
-            onChangePassword={setPassword}
-            onSelectedCompany={setSelectedItem} // Corrected here
-            onRegister={handleRegister}
-          />
-        )}
-      </View>
-    </SafeAreaView>
+          <View style={styles.auth_container}>
+            {/* Tab for Login and Registration */}
+            <Tab
+              data={TabItems}
+              selectedIndex={selectedIndex}
+              onChange={setSelectedIndex}
+            />
+
+            {selectedIndex === 0 ? (
+              <Login
+                onChangeText={setUsername}
+                onChangePassword={setPassword}
+                onLogin={handleLogin}
+                loading={loading}
+              />
+            ) : (
+              <Registration
+                onChangeText={(field, value) => {
+                  if (field === "firstName") setFirstName(value);
+                  else if (field === "lastName") setLastName(value);
+                  else if (field === "username") setUsername(value);
+                  else if (field === "companyName") setCompanyName(value);
+                }}
+                onChangePassword={setPassword}
+                onSelectedCompany={setSelectedItem} // Corrected here
+                onRegister={handleRegister}
+              />
+            )}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -126,6 +147,12 @@ const styles = StyleSheet.create({
     borderRadius: 71,
     flex: 1,
     alignItems: "center",
+    justifyContent: "center", // This will help center the form vertically
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    flex: 1,
+    justifyContent: "center", // This centers the form content
   },
 });
 

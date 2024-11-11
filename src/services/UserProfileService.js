@@ -44,3 +44,58 @@ export const fetchRegionlist = async (token) => {
     throw new Error("Failed to fetch user"); // Throw an error if the request fails
   }
 };
+export const fetchFamilylist = async (token) => {
+  try {
+    const response = await axios.get(
+      `http://${AUTHAPI}/api/products/families/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Add Bearer token to the header
+        },
+      }
+    );
+    return response.data; // Return the fetched products
+  } catch (error) {
+    throw new Error("Failed to fetch user"); // Throw an error if the request fails
+  }
+};
+export const fetchTypeslist = async (token) => {
+  try {
+    const response = await axios.get(`http://${AUTHAPI}/api/products/types/`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add Bearer token to the header
+      },
+    });
+    return response.data; // Return the fetched products
+  } catch (error) {
+    throw new Error("Failed to fetch user"); // Throw an error if the request fails
+  }
+};
+export const fetchFieldslist = async (token) => {
+  try {
+    const response = await axios.get(`http://${AUTHAPI}/api/create/`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add Bearer token to the header
+      },
+    });
+    return response.data; // Return the fetched products
+  } catch (error) {
+    throw new Error("Failed to fetch fetchFieldslist"); // Throw an error if the request fails
+  }
+};
+export const createFieldService = async (token) => {
+  try {
+    const response = await axios.post(
+      `http://${AUTHAPI}/api/create/`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Add Bearer token to the header
+        },
+      }
+    );
+    return response.data; // Return the fetched data
+  } catch (error) {
+    throw new Error("Failed to fetch user"); // Throw an error if the request fails
+  }
+};
