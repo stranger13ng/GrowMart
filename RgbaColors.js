@@ -6,4 +6,5 @@ export default RgbaColors = {
   PRIMARY_BLACK_BACKGROUND_ANDROID: "rgba(18, 18, 24, 1)",
   SECONDARY_PURPLE: "rgba(140, 137, 250, 0.4)",
   TERTIARY_TEXT_WHITE: "rgba(255, 255, 255, 0.15)",
+  TERTIARY_BLACK_BACKGROUND: "rgba(7, 7, 10, 0.9)",
 };

@@ -7,6 +7,8 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Dimensions,
+  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native"; // Import useNavigation for navigation
 import { useAuth } from "../../app/context/AuthContext"; // Import useAuth to access the logout function
@@ -18,12 +20,73 @@ import {
   fetchProducts,
   fetchProductsTypes,
 } from "../../src/services/ProductService";
+import { HeaderTitle } from "@react-navigation/elements";
 
 const Home = () => {
+  const HeaderIcon = ({ source }) => {
+    const iconButtonWidth = ((Dimensions.get("window").width - 40) / 67) * 9;
+    return (
+      <View
+        style={[
+          styles.iconContainer,
+          { width: iconButtonWidth, height: iconButtonWidth },
+        ]}
+      >
+        <Image
+          source={source}
+          resizeMode="contain"
+          style={{
+            width: (iconButtonWidth * 4) / 7,
+            height: (iconButtonWidth * 4) / 7,
+          }}
+        />
+      </View>
+    );
+  };
+
   const navigation = useNavigation(); // Hook to navigate to other screens
+  const width = Dimensions.get("window").width;
+
   const { logout, getAuthToken } = useAuth(); // Access the logout function and token from AuthContext
+  const horizontalPadding = (width * 20) / 375;
+  const iconButtonWidth = (width / 375) * 40;
 
   const [products, setProducts] = useState([]); // State to store products
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => logout()} // Pass ref.current
+          style={{ justifyContent: "center", paddingLeft: 20 }}
+        >
+          <View
+            style={{
+              // flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              // padding: 8,
+              backgroundColor: RgbaColors.PRIMARY_WHITE_BACKGROUND,
+              borderRadius: 100,
+              width: iconButtonWidth,
+              height: iconButtonWidth,
+            }}
+          >
+            <Image
+              source={IMAGES.LOGOUT}
+              resizeMode="contain"
+              style={{
+                width: (iconButtonWidth * 4) / 7,
+                height: (iconButtonWidth * 4) / 7,
+                marginRight: 5,
+                //   tintColor: "black",
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   // Function to fetch products using the fetchProducts service
   const getProducts = async () => {

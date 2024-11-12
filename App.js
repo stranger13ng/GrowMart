@@ -110,6 +110,7 @@ export const Layout = () => {
             tabBarIcon: ({ focused }) => renderTabIcon(IMAGES.HOME1, focused),
             headerShown: true,
             headerTitle: "",
+            headerShadowVisible: false,
             headerBackVisible: false,
             headerBackTitleVisible: false,
             headerTitleAlign: "center",

@@ -7,6 +7,7 @@ import IMAGES from "../../Assets";
 import ProfileMain from "../Profile/ProfileMain";
 import Test from "./Test";
 import RgbaColors from "../../RgbaColors";
+import { BlurView } from "expo-blur";
 
 const Tab = createBottomTabNavigator();
 
@@ -64,7 +65,20 @@ const NavigationBarBottom = () => {
       initialRouteName="Home"
       screenOptions={{
         tabBarShowLabel: false,
-        tabBarStyle: { backgroundColor: "black" },
+        headerShadowVisible: false,
+        tabBarHideOnKeyboard: true,
+        tabBarStyle: {
+          backgroundColor: RgbaColors.TERTIARY_BLACK_BACKGROUND,
+          shadowRadius: 0,
+          shadowOffset: 0,
+          shadowColor: "transparent",
+          shadowOpacity: 0,
+          borderWidth: 0,
+          borderTopWidth: 0,
+          position: "absolute",
+          // padding: 0,
+          // margin: 0,
+        },
 
         // headerShown: false, // No headers from the tab navigator itself
       }}
@@ -82,7 +96,8 @@ const NavigationBarBottom = () => {
         options={{
           tabBarIcon: ({ focused }) => renderTabIcon(IMAGES.HOME1, focused),
           headerShown: true,
-          headerTitle: LogoTitle,
+          headerTitle: "",
+          headerShadowVisible: false,
           headerTitleAlign: "center",
           // headerLeft: () => <HeaderIcon source={IMAGES.BELL} />,
           headerLeft: () => (

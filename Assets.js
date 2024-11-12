@@ -51,6 +51,7 @@ const IMAGES = {
   EMPTYPRODUCTS: require("./assets/emptyproducts.png"),
   INFOPANELFOOTER: require("./assets/infopanelfooter.png"),
   MAPILLUSTRATION2: require("./assets/map2.png"),
+  LOGOUT: require("./assets/logout.png"),
 };
 
 export default IMAGES;
