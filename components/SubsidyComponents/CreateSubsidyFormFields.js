@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+} from "react";
 import {
   View,
   Text,
@@ -8,7 +14,6 @@ import {
   Image,
   ScrollView,
   Platform,
-  Alert,
   TouchableOpacity,
 } from "react-native";
 import RgbaColors from "../../RgbaColors";
@@ -22,17 +27,16 @@ import {
   fetchRegionlist,
   fetchTypeslist,
 } from "../../src/services/UserProfileService";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { showMessage } from "react-native-flash-message";
 
 const screenWidth = Dimensions.get("window").width;
 
 const CreateSubsidyFormFields = () => {
-  const [loading, setLoading] = useState(false);
-
   const route = useRoute();
-  const { user } = route.params; // Get user data from navigation params
-  const { getAuthToken } = useAuth();
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const { user } = route.params;
+  const formDataRef = useRef(formData); // Create a ref to track formData
+
   const [formData, setFormData] = useState({
     city: "",
     region: "",
@@ -45,9 +49,46 @@ const CreateSubsidyFormFields = () => {
     culture: "",
     sort: "",
     fraction: "",
-    user: "",
-    field: "",
+    user: user ? user.id : "",
+    // field: "",
   });
+  const navigation = useNavigation();
+  const handleOnChangeText = (key, value) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [key]: value,
+    }));
+    // console.log("Form Data Updated:", formData);
+  };
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => handleFieldCreation(formDataRef.current)} // Pass ref.current
+          style={{
+            backgroundColor: RgbaColors.PRIMARY_PURPLE,
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderRadius: 25,
+          }}
+        >
+          <Text style={{ fontSize: 16, color: "white", fontWeight: 600 }}>
+            Создать
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+  const [loading, setLoading] = useState(false);
+
+  // Get user data from navigation params
+  const { getAuthToken } = useAuth();
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
   const [selectData, setSelectData] = useState([]);
   const [selectField, setSelectField] = useState([]);
   const [selectFamily, setSelectFamily] = useState([]);
@@ -56,7 +97,17 @@ const CreateSubsidyFormFields = () => {
   const filteredSelectTypes = selectType.filter(
     (type) => type.family.id === formData.family
   );
-  const handleFieldCreation = async () => {
+
+  useEffect(() => {
+    if (user && user.id) {
+      setFormData((prevData) => ({
+        ...prevData,
+        user: user.id, // Ensure user id is correctly set in formData
+      }));
+    }
+  }, [user]);
+
+  const handleFieldCreation = async (formData) => {
     const {
       city,
       region,
@@ -65,65 +116,142 @@ const CreateSubsidyFormFields = () => {
       cadastre,
       area,
       totalArea,
+      family,
+      culture,
+      sort,
+      fraction,
       user,
-    } = formData; // Destructure from formData
+    } = formData;
+    console.log("Form Data Inside Creation:", formData);
+    const requiredFields = [
+      city,
+      region,
+      district,
+      landUsage,
+      cadastre,
+      area,
+      totalArea,
+      family,
+      culture,
+      sort,
+      fraction,
+      user,
+    ];
+    console.log(requiredFields);
+    // Validate if all required fields are filled and user is defined
+    if (!user) {
+      showMessage({
+        message: "Error: User ID is missing.",
+        type: "danger",
+        icon: "danger",
+        duration: 3000,
+      });
+      return;
+    }
 
-    // Validate if all required fields are filled
-    if (
-      !city ||
-      !region ||
-      !district ||
-      !landUsage ||
-      !cadastre ||
-      !area ||
-      !totalArea ||
-      !user
-    ) {
-      Alert.alert("Error", "Please fill in all required fields.");
+    if (requiredFields.some((field) => !field)) {
+      showMessage({
+        message: "Error: Please fill in all required fields.",
+        type: "danger",
+        icon: "danger",
+        duration: 3000,
+      });
       return;
     }
 
     setLoading(true); // Show loading indicator
 
     try {
-      // Get the token from AuthContext
-      const token = await getAuthToken();
+      // Fetch the token
+      let token;
+      try {
+        token = await getAuthToken();
+      } catch (error) {
+        console.error("Error fetching auth token:", error);
+        showMessage({
+          message: `Error: Unable to fetch auth token. ${error.message}`,
+          type: "danger",
+          icon: "danger",
+          duration: 3000,
+        });
+        return;
+      }
 
-      // Call the API to create the field with the provided data
-      await createField(
-        city,
-        region,
-        district,
-        landUsage,
-        cadastre,
-        area,
-        totalArea,
-        user,
-        token
-      );
+      // Create the field first
+      let responseData;
+      try {
+        responseData = await createField(
+          city,
+          region,
+          district,
+          landUsage,
+          cadastre,
+          area,
+          totalArea,
+          user,
+          token
+        );
+        // console.log("Field created successfully", responseData);
+      } catch (error) {
+        console.error("Error creating field:", error);
+        showMessage({
+          message: `Error: Unable to create field. ${error.message}`,
+          type: "danger",
+          icon: "danger",
+          duration: 3000,
+        });
+        return;
+      }
 
-      // Show success message
-      Alert.alert("Success", "Field created successfully");
+      const field = responseData.id; // Save the field ID returned from createField
+      // console.log("Field ID:", field);
 
-      // Optionally reset the form data
+      // Now, proceed with creating the product using the newly created field ID
+      let productResponse;
+      try {
+        productResponse = await createProduct(
+          family,
+          culture,
+          sort,
+          fraction,
+          field, // Pass the field ID from the createField response
+          token
+        );
+        // console.log("Product created with field ID:", productResponse.id);
+      } catch (error) {
+        console.error("Error creating product:", error);
+        showMessage({
+          message: `Error: Unable to create product. ${error.message}`,
+          type: "danger",
+          icon: "danger",
+          duration: 3000,
+        });
+        return;
+      }
+
+      showMessage({
+        message: "Field and product created successfully!",
+        type: "success",
+        icon: "success",
+        duration: 3000, // Display for 3 seconds
+        backgroundColor: "#28a745", // Green color for success
+      });
+
+      // Optionally reset the form data after successful creation
       resetFormData();
-
-      // Navigate to another screen or reset specific states here if needed
-      // Example: navigation.goBack();
     } catch (error) {
-      console.error("Field creation error:", error);
-
-      // Provide more detailed error feedback
-      Alert.alert(
-        "Error",
-        "There was an issue with your submission. Please try again."
-      );
+      console.error("Unexpected error:", error);
+      showMessage({
+        message: `Error: Something went wrong. ${error.message}`,
+        type: "danger",
+        icon: "danger",
+        duration: 3000,
+      });
     } finally {
       setLoading(false); // Hide loading indicator
     }
   };
 
-  // Function to reset the form data
   const resetFormData = () => {
     setFormData({
       city: "",
@@ -137,143 +265,35 @@ const CreateSubsidyFormFields = () => {
       culture: "",
       sort: "",
       fraction: "",
+      user: user ? user.id : "", // Reset user field
       field: "",
     });
   };
 
-  const handleProductCreation = async () => {
-    const { family, culture, sort, fraction, field } = formData; // Destructure from formData
-
-    // Validate if all required fields are filled
-    if (!family || !culture || !sort || !fraction || !field) {
-      Alert.alert("Error", "Please fill in all required fields.");
-      return; // Exit the function early if validation fails
-    }
-
-    setLoading(true); // Show loading indicator
-    try {
-      const token = await getAuthToken(); // Get the token from AuthContext
-
-      // Log the data to be sent (optional)
-      console.log("Creating product with data:", {
-        family,
-        culture,
-        sort,
-        fraction,
-        field,
-      });
-
-      // Call the API to create the product
-      const response = await createProduct(
-        family,
-        culture,
-        sort,
-        fraction,
-        field,
-        token
-      );
-
-      // Assuming the API response is successful, you can proceed with next steps
-      Alert.alert("Product Created Successfully");
-
-      // Optionally, reset the form or navigate to another screen here if needed
-      setFormData({
-        family: "",
-        culture: "",
-        sort: "",
-        fraction: "",
-        field: "",
-      });
-
-      // Optionally, navigate or update UI after success
-    } catch (error) {
-      console.error("handleProductCreation error:", error);
-      Alert.alert(
-        "Product Creation Error",
-        error.message ||
-          "There was an issue with your submission. Please try again."
-      );
-    } finally {
-      setLoading(false); // Hide loading indicator
-    }
-  };
-
-  const setUserId = () => {
-    // Ensure user exists and has an 'id' field
-    if (user && user.id) {
-      handleOnChangeText("user", user.id);
-    }
-  };
-
   useEffect(() => {
-    if (user) {
-      setUserId(); // Call function to set user ID
-    }
-  }, [user]);
-
-  useEffect(() => {
-    console.log("Form Data Updated:", formData); // This will log the updated form data
-  }, [formData]); // Track changes to formData
-
-  useEffect(() => {
-    const fetchRegion = async () => {
+    const fetchData = async () => {
       try {
-        const token = await getAuthToken(); // Get the token from AuthContext
-        const data = await fetchRegionlist(token); // Fetch region data
-        setSelectData(data); // Set the region data to state
+        const token = await getAuthToken();
+        const regionData = await fetchRegionlist(token);
+        setSelectData(regionData);
+
+        const familyData = await fetchFamilylist(token);
+        setSelectFamily(familyData);
+
+        const typeData = await fetchTypeslist(token);
+        setSelectType(typeData);
       } catch (error) {
-        console.error("Error fetching Region:", error);
-        Alert.alert("Error", "Failed to fetch Region. Please try again.");
-      }
-    };
-    fetchRegion(); // Call the fetch function on mount
-  }, [getAuthToken]);
-  useEffect(() => {
-    const fetchFields = async () => {
-      try {
-        const token = await getAuthToken(); // Get the token from AuthContext
-        const data = await fetchFieldslist(token); // Fetch region data
-        setSelectField(data); // Set the region data to state
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching Region:", error);
-        Alert.alert("Error", "Failed to fetch Region. Please try again.");
+        console.error("Error fetching data:", error);
+        showMessage({
+          message: "Error, failed to fetch data. Please try again.",
+          type: "danger",
+          icon: "danger",
+          duration: 3000,
+        });
       }
     };
 
-    fetchFields(); // Call the fetch function on mount
-  }, [getAuthToken]);
-
-  useEffect(() => {
-    const fetchFamilies = async () => {
-      try {
-        const token = await getAuthToken(); // Get the token from AuthContext
-        const data = await fetchFamilylist(token); // Fetch region data
-        setSelectFamily(data); // Set the region data to state
-        // console.log(data);
-      } catch (error) {
-        console.error("Error fetching Region:", error);
-        Alert.alert("Error", "Failed to fetch Region. Please try again.");
-      }
-    };
-
-    fetchFamilies(); // Call the fetch function on mount
-  }, [getAuthToken]);
-
-  useEffect(() => {
-    const fetchTypes = async () => {
-      try {
-        const token = await getAuthToken(); // Get the token from AuthContext
-        const data = await fetchTypeslist(token); // Fetch region data
-        setSelectType(data); // Set the region data to state
-        // console.log(data);
-      } catch (error) {
-        console.error("Error fetching Region:", error);
-        Alert.alert("Error", "Failed to fetch Region. Please try again.");
-      }
-    };
-
-    fetchTypes(); // Call the fetch function on mount
+    fetchData();
   }, [getAuthToken]);
 
   const TabItems = [
@@ -291,17 +311,8 @@ const CreateSubsidyFormFields = () => {
     { text: "XL", title: "Крупная" },
   ];
 
-  const handleOnChangeText = (key, value) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [key]: value,
-    }));
-    // console.log("Form Data Updated:", formData);
-  };
-
   const handleTabChange = (index) => {
     setSelectedIndex(index);
-    // console.log("Selected tab index:", index);
   };
 
   return (
@@ -369,9 +380,6 @@ const CreateSubsidyFormFields = () => {
           onChangeText={handleOnChangeText}
           image={IMAGES.PEN}
         />
-        <TouchableOpacity style={styles.button} onPress={handleFieldCreation}>
-          <Text style={{ color: "#fff" }}>REGISTER FIELD</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.addressContainer}>
@@ -392,14 +400,14 @@ const CreateSubsidyFormFields = () => {
       </View>
 
       <View style={styles.inputFieldsContainer}>
-        <InputFieldCreator
+        {/* <InputFieldCreator
           title={"Поле"}
           keyName={"field"}
           value={formData.field}
           onChangeText={handleOnChangeText}
           image={IMAGES.DROPDOWNICON}
           selectData={selectField}
-        />
+        /> */}
         <InputFieldCreator
           title={"Семейство"}
           keyName={"family"}
@@ -431,10 +439,9 @@ const CreateSubsidyFormFields = () => {
           image={IMAGES.DROPDOWNICON}
           selectData={SelectFractionDropdown}
         />
-        <TouchableOpacity style={styles.button} onPress={handleProductCreation}>
-          <Text style={{ color: "#fff" }}>REGISTER CULTURE</Text>
-        </TouchableOpacity>
       </View>
+
+      <View style={{ height: 100 }} />
     </ScrollView>
   );
 };

@@ -1,7 +1,16 @@
-import React from "react";
-import { Dimensions, Image, Platform, StyleSheet, View } from "react-native";
+import React, { useRef } from "react";
+import {
+  Dimensions,
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import RgbaColors from "./RgbaColors";
 
@@ -14,6 +23,7 @@ import { AuthProvider, useAuth } from "./app/context/AuthContext";
 import IMAGES from "./Assets";
 import NavigationBarBottom from "./components/Home/NavigationBarBottom";
 import CreateSubsidyFormFields from "./components/SubsidyComponents/CreateSubsidyFormFields";
+import FlashMessage from "react-native-flash-message";
 
 // Define the stack navigator
 const Stack = createNativeStackNavigator();
@@ -55,54 +65,91 @@ const HeaderIcon = ({ source }) => {
 export default function App() {
   return (
     <AuthProvider>
-      <Layout />
+      <NavigationContainer>
+        <Layout />
+      </NavigationContainer>
     </AuthProvider>
   );
 }
 
-// Layout Component
 export const Layout = () => {
+  const width = Dimensions.get("window").width;
+  const horizontalPadding = (width * 20) / 375;
+  const headerHeight = (width * 40) / 375;
   const { authState } = useAuth();
+  const navigation = useNavigation();
+
+  const childRef = useRef();
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName={authState.access ? "Home" : "Authorization"}
-        >
-          {authState.access ? (
-            <Stack.Screen
-              name="NavigationBarBottom"
-              component={NavigationBarBottom} // A new screen containing the Bottom Tab Navigator
-              options={{ headerShown: false }} // Hide header here, since it's managed by bottom tabs
-            />
-          ) : (
-            // <Stack.Screen
-            //   name="Home"
-            //   component={Home}
-            //   options={{
-            //     headerShown: true,
-            //     headerTitle: LogoTitle,
-            //     headerTitleAlign: "center",
-            //     headerLeft: () => <HeaderIcon source={IMAGES.BELL} />,
-            //     headerRight: () => <HeaderIcon source={IMAGES.CART} />,
-            //     headerStyle: {
-            //       backgroundColor:
-            //         Platform.OS === "ios"
-            //           ? RgbaColors.PRIMARY_BLACK_BACKGROUND
-            //           : RgbaColors.PRIMARY_BLACK_BACKGROUND_ANDROID,
-            //     },
-            //   }}
-            // />
-            <Stack.Screen
-              name="Authorization"
-              component={AuthComponent}
-              options={{ headerShown: false }}
-            />
-          )}
-          <Stack.Screen name="FarmField" component={CreateSubsidyFormFields} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <FlashMessage
+        position="top"
+        style={{ paddingTop: Platform.OS === "ios" ? 10 : 50 }}
+      />
+      <Stack.Navigator
+        initialRouteName={authState.access ? "Home" : "Authorization"}
+      >
+        {authState.access ? (
+          <Stack.Screen
+            name="NavigationBarBottom"
+            component={NavigationBarBottom} // A new screen containing the Bottom Tab Navigator
+            options={{ headerShown: false }} // Hide header here, since it's managed by bottom tabs
+          />
+        ) : (
+          <Stack.Screen
+            name="Authorization"
+            component={AuthComponent}
+            options={{ headerShown: false }}
+          />
+        )}
+        <Stack.Screen
+          name="FarmField"
+          component={CreateSubsidyFormFields}
+          options={{
+            tabBarIcon: ({ focused }) => renderTabIcon(IMAGES.HOME1, focused),
+            headerShown: true,
+            headerTitle: "",
+            headerBackVisible: false,
+            headerBackTitleVisible: false,
+            headerTitleAlign: "center",
+            headerTintColor: "white",
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}
+              >
+                <HeaderIcon source={IMAGES.BACKBUTTON} />
+              </TouchableOpacity>
+            ),
+            // headerRight: () => (
+            //   <TouchableOpacity
+            //     onPress={childRef.create}
+            //     style={{
+            //       backgroundColor: RgbaColors.PRIMARY_PURPLE,
+            //       paddingHorizontal: 20,
+            //       paddingVertical: 10,
+            //       borderRadius: 25,
+            //     }}
+            //   >
+            //     <Text style={{ fontSize: 16, color: "white", fontWeight: 600 }}>
+            //       Создать
+            //     </Text>
+            //   </TouchableOpacity>
+            // ),
+            headerStyle: {
+              backgroundColor:
+                Platform.OS === "ios"
+                  ? RgbaColors.PRIMARY_BLACK_BACKGROUND
+                  : RgbaColors.PRIMARY_BLACK_BACKGROUND_ANDROID,
+
+              height:
+                Platform.OS === "ios" ? headerHeight * 1.4 : headerHeight * 2,
+            },
+          }}
+        />
+      </Stack.Navigator>
     </GestureHandlerRootView>
   );
 };

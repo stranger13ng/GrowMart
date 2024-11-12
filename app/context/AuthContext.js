@@ -3,6 +3,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Text, View } from "react-native";
 import { AUTHAPI } from "../../components/Authentication/Registration/AuthAPI";
+import { showMessage } from "react-native-flash-message";
 
 // Default context values
 const defaultAuthState = {
@@ -107,8 +108,6 @@ export const AuthProvider = ({ children }) => {
     user,
     token
   ) => {
-    const region_district = district; // It's not clear why you need this variable, but it's passed.
-
     try {
       const response = await axios.post(
         `http://${AUTHAPI}/api/create/`,
@@ -116,12 +115,12 @@ export const AuthProvider = ({ children }) => {
           city,
           region,
           city_district: district,
+          region_district: district,
           ownership: landUsage,
           cadastral_number: cadastre,
           used_area: area,
           total_area: totalArea,
           user,
-          region_district,
         },
         {
           headers: {
@@ -130,14 +129,16 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      // If the API response contains an access token, store it and update authState
-      if (response.data.access) {
-        await AsyncStorage.setItem("useraccess", response.data.access); // Store the access token in AsyncStorage
-        setAuthState({ access: response.data.access }); // Update the auth state with the new access token
+      // Handle successful field creation
+      if (response.data) {
+        console.log("Field created successfully:", response.data);
+        return response.data; // Return the data to the caller
+      } else {
+        throw new Error("Unexpected response format");
       }
     } catch (error) {
       console.error("Field creation error:", error);
-      throw new Error("Field creation failed"); // Rethrow error if API request fails
+      throw error; // Rethrow the error for handling by the caller
     }
   };
 
@@ -178,10 +179,14 @@ export const AuthProvider = ({ children }) => {
       return response.data; // Optionally return response data if needed in the calling component
     } catch (error) {
       console.error("Product creation error:", error);
-      Alert.alert(
-        "Error",
-        "There was an issue creating the product. Please try again."
-      ); // Show a user-friendly error message
+      showMessage({
+        message:
+          "Error, There was an issue creating the product. Please try again.",
+        type: "danger",
+        icon: "danger",
+        duration: 3000, // Display for 3 seconds
+      });
+
       throw new Error("Product creation failed"); // Rethrow error if API request fails
     }
   };

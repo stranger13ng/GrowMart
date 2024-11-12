@@ -113,6 +113,30 @@ const NavigationBarBottom = () => {
         component={ProfileMain}
         options={{
           tabBarIcon: ({ focused }) => renderTabIcon(IMAGES.USER, focused),
+          headerShown: true,
+          headerTitle: LogoTitle,
+          headerTitleAlign: "center",
+          // headerLeft: () => <HeaderIcon source={IMAGES.BELL} />,
+          headerLeft: () => (
+            <View style={{ paddingLeft: horizontalPadding }}>
+              <HeaderIcon source={IMAGES.BELL} />
+            </View>
+          ),
+          // headerRight: () => <HeaderIcon source={IMAGES.CART} />,
+          headerRight: () => (
+            <View style={{ paddingRight: horizontalPadding }}>
+              <HeaderIcon source={IMAGES.CART} />
+            </View>
+          ),
+          headerStyle: {
+            backgroundColor:
+              Platform.OS === "ios"
+                ? RgbaColors.PRIMARY_BLACK_BACKGROUND
+                : RgbaColors.PRIMARY_BLACK_BACKGROUND_ANDROID,
+
+            height:
+              Platform.OS === "ios" ? headerHeight * 1.4 : headerHeight * 2,
+          },
         }}
       />
       {/* <Tab.Screen

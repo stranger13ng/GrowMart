@@ -34,6 +34,7 @@ const IMAGES = {
   LOGOv2: require("./assets/logo_new.png"),
   PIN: require("./assets/pin.png"),
   ARROWDOWN: require("./assets/arrowdown.png"),
+  BACKBUTTON: require("./assets/backbutton.png"),
   ARROWUP: require("./assets/arrowup.png"),
   EARTH: require("./assets/earth.png"),
   LIST: require("./assets/list.png"),
