@@ -239,6 +239,7 @@ const CreateSubsidyFormFields = () => {
 
       // Optionally reset the form data after successful creation
       resetFormData();
+      navigation.goBack();
     } catch (error) {
       console.error("Unexpected error:", error);
       showMessage({
@@ -365,6 +366,7 @@ const CreateSubsidyFormFields = () => {
           value={formData.cadastre}
           onChangeText={handleOnChangeText}
           image={IMAGES.PEN}
+          inputKeyboard={"numeric"}
         />
         <InputFieldCreator
           title={"Площадь"}
@@ -453,6 +455,7 @@ const InputFieldCreator = ({
   value,
   image,
   selectData,
+  inputKeyboard,
 }) => {
   return (
     <View style={styles.inputField}>
@@ -510,6 +513,7 @@ const InputFieldCreator = ({
             value={value}
             onChangeText={(text) => onChangeText(keyName, text)}
             placeholder={title}
+            inputMode={inputKeyboard}
             placeholderTextColor="rgba(255, 255, 255, 0.5)"
           />
           <Image

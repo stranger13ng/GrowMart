@@ -83,6 +83,18 @@ export const fetchFieldslist = async (token) => {
     throw new Error("Failed to fetch fetchFieldslist"); // Throw an error if the request fails
   }
 };
+export const fetchProductlist = async (token) => {
+  try {
+    const response = await axios.get(`http://${AUTHAPI}/api/product/`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add Bearer token to the header
+      },
+    });
+    return response.data; // Return the fetched products
+  } catch (error) {
+    throw new Error("Failed to fetch fetchFieldslist"); // Throw an error if the request fails
+  }
+};
 export const createFieldService = async (token) => {
   try {
     const response = await axios.post(
