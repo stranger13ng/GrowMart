@@ -10,8 +10,8 @@ import {
   Dimensions,
   Image,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation for navigation
-import { useAuth } from "../../app/context/AuthContext"; // Import useAuth to access the logout function
+import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "../../app/context/AuthContext";
 import ProductCard from "../Products/ProductCard";
 import SearchBarComponent from "../SearchBarComponent";
 import IMAGES from "../../Assets";
@@ -20,101 +20,43 @@ import {
   fetchProducts,
   fetchProductsTypes,
 } from "../../src/services/ProductService";
-import { HeaderTitle } from "@react-navigation/elements";
 
 const Home = () => {
-  const HeaderIcon = ({ source }) => {
-    const iconButtonWidth = ((Dimensions.get("window").width - 40) / 67) * 9;
-    return (
-      <View
-        style={[
-          styles.iconContainer,
-          { width: iconButtonWidth, height: iconButtonWidth },
-        ]}
-      >
-        <Image
-          source={source}
-          resizeMode="contain"
-          style={{
-            width: (iconButtonWidth * 4) / 7,
-            height: (iconButtonWidth * 4) / 7,
-          }}
-        />
-      </View>
-    );
-  };
+  const [products, setProducts] = useState([]); // State to store all products
+  const [searchQuery, setSearchQuery] = useState(""); // State to store search query
 
-  const navigation = useNavigation(); // Hook to navigate to other screens
+  const navigation = useNavigation();
+  const { logout, getAuthToken } = useAuth();
   const width = Dimensions.get("window").width;
-
-  const { logout, getAuthToken } = useAuth(); // Access the logout function and token from AuthContext
-  const horizontalPadding = (width * 20) / 375;
   const iconButtonWidth = (width / 375) * 40;
 
-  const [products, setProducts] = useState([]); // State to store products
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => logout()} // Pass ref.current
-          style={{ justifyContent: "center", paddingLeft: 20 }}
-        >
-          <View
-            style={{
-              // flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              // padding: 8,
-              backgroundColor: RgbaColors.PRIMARY_WHITE_BACKGROUND,
-              borderRadius: 100,
-              width: iconButtonWidth,
-              height: iconButtonWidth,
-            }}
-          >
-            <Image
-              source={IMAGES.LOGOUT}
-              resizeMode="contain"
-              style={{
-                width: (iconButtonWidth * 4) / 7,
-                height: (iconButtonWidth * 4) / 7,
-                marginRight: 5,
-                //   tintColor: "black",
-              }}
-            />
-          </View>
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-
-  // Function to fetch products using the fetchProducts service
+  // Function to fetch products
   const getProducts = async () => {
     try {
-      const token = await getAuthToken(); // Get the token from AuthContext
-      const fetchedProducts = await fetchProducts(token); // Call the service to fetch products
-      setProducts(fetchedProducts); // Store the fetched products in the state
+      const token = await getAuthToken();
+      const fetchedProducts = await fetchProductsTypes(token);
+      setProducts(fetchedProducts);
     } catch (error) {
       console.error("Error fetching products:", error);
       Alert.alert("Error", "Failed to fetch products. Please try again.");
     }
   };
 
-  // Fetch products when the component mounts
+  // Fetch products when component mounts
   useEffect(() => {
-    getProducts(); // Call the function to fetch products
-  }, []); // Empty dependency array to run only once when the component mounts
+    getProducts();
+  }, []);
 
-  // Logout handler
-  const onLogoutPress = async () => {
-    try {
-      await logout(); // Call the logout function from AuthContext
-      navigation.navigate("Authorization"); // Navigate to Authorization screen after logout
-      Alert.alert("Logged out successfully");
-    } catch (error) {
-      Alert.alert("Error", "Logout failed, please try again");
-    }
-  };
+  useEffect(() => {
+    console.log("Search query changed:", searchQuery);
+  }, [searchQuery]);
+
+  // Filter products based on the search query
+  const filteredProducts = searchQuery
+    ? products.filter((product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : products; // Show all products if search query is empty
 
   return (
     <ScrollView
@@ -127,38 +69,20 @@ const Home = () => {
       }}
     >
       <ScrollViewCarousel />
-      <SearchBarComponent />
 
-      {/* Pass fetched products to the ProductCard component */}
+      {/* Pass setSearchQuery to SearchBarComponent */}
+      <SearchBarComponent onChangeText={(text) => setSearchQuery(text)} />
+
+      {/* Render ProductCard with filtered products */}
       <ProductCard
         products={
-          products.length
-            ? products
-            : [
-                { name: "Лимон", image: IMAGES.LEMON },
-                { name: "Капуста", image: IMAGES.CABAGGE },
-                { name: "Тыква", image: IMAGES.PUMPKIN },
-                { name: "Томат", image: IMAGES.TOMATO },
-              ]
+          filteredProducts.length ? filteredProducts : [] // Empty array if no products match the search query
         }
       />
 
-      <TouchableOpacity style={styles.button} onPress={onLogoutPress}>
-        <Text style={{ color: "#fff" }}>LOGOUT</Text>
-      </TouchableOpacity>
+      <View style={{ height: Platform.OS === "ios" ? 120 : 70 }} />
     </ScrollView>
   );
-};
-
-// Styles for the button
-const styles = {
-  button: {
-    backgroundColor: "#FF6347", // You can change the color
-    padding: 10,
-    alignItems: "center",
-    marginTop: 20,
-    borderRadius: 5,
-  },
 };
 
 export default Home;

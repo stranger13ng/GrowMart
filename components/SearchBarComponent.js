@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import PropTypes from "prop-types";
 import IMAGES from "../Assets";
 import RgbaColors from "../RgbaColors";
 
-const SearchBarComponent = () => {
+const SearchBarComponent = ({ onChangeText }) => {
   const windowHeight = Dimensions.get("window").height;
   const [activeIcon, setActiveIcon] = useState(2); // Default active icon (index-based)
+  const [searchQuery, setSearchQuery] = useState(""); // Local state for search query
 
   const icons = [
     { source: IMAGES.EARTH, inactiveColor: "gray", activeColor: "white" },
@@ -23,15 +25,28 @@ const SearchBarComponent = () => {
     },
   ];
 
+  // Handle input changes and update search query
+  const handleInputChange = (text) => {
+    setSearchQuery(text); // Update local state
+    onChangeText(text); // Trigger parent component's callback
+  };
+
   return (
     <View style={styles.container}>
       <View style={[styles.searchContainer, { height: windowHeight / 20 }]}>
         <Image source={IMAGES.SEARCH} style={styles.searchIcon} />
         <TextInput
+          value={searchQuery}
+          onChangeText={handleInputChange}
           placeholder="Поиск"
           placeholderTextColor={RgbaColors.SECONDARY_TEXT_WHITE}
           style={styles.searchInput}
         />
+        {searchQuery != "" && (
+          <TouchableOpacity>
+            <Image source={IMAGES.CROSS} style={styles.crossIcon} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.iconContainer}>
@@ -87,6 +102,14 @@ const styles = {
     marginLeft: 20,
     marginRight: 10,
   },
+  crossIcon: {
+    tintColor: "#FFF",
+    height: 12,
+    width: 12,
+    marginVertical: 8,
+    marginLeft: 10,
+    marginRight: 20,
+  },
   searchInput: {
     color: "white",
     fontSize: 14,
@@ -109,6 +132,11 @@ const styles = {
   activeIconBackground: {
     backgroundColor: RgbaColors.PRIMARY_PURPLE,
   },
+};
+
+// Define prop types for better clarity
+SearchBarComponent.propTypes = {
+  onChangeText: PropTypes.func.isRequired,
 };
 
 export default SearchBarComponent;

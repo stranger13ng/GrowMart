@@ -52,6 +52,7 @@ const IMAGES = {
   INFOPANELFOOTER: require("./assets/infopanelfooter.png"),
   MAPILLUSTRATION2: require("./assets/map2.png"),
   LOGOUT: require("./assets/logout.png"),
+  CROSS: require("./assets/cross.png"),
 };
 
 export default IMAGES;

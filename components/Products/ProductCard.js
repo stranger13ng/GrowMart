@@ -11,23 +11,29 @@ const ProductCard = ({ products }) => {
 
   return (
     <View style={{ flex: 1, paddingTop: 5 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          paddingHorizontal: 20,
-          gap: 5,
-        }}
-      >
-        {products.map((product, index) => (
-          <ProductCardItem
-            key={index}
-            product={product}
-            cardWidth={cardWidth}
-            cardHeight={cardHeight}
-          />
-        ))}
-      </View>
+      {products.length === 0 ? (
+        <Text style={{ textAlign: "center", color: "white", fontWeight: 700 }}>
+          Ничего не найдено.
+        </Text>
+      ) : (
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            paddingHorizontal: 20,
+            gap: 5,
+          }}
+        >
+          {products.map((product, index) => (
+            <ProductCardItem
+              key={index}
+              product={product}
+              cardWidth={cardWidth}
+              cardHeight={cardHeight}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 };
