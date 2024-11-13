@@ -18,6 +18,7 @@ const IMAGES = {
   LEAFS: require("./assets/leafs.png"),
   TOMATO: require("./assets/tomato.png"),
   CABAGGE: require("./assets/cabbage.png"),
+  ONION: require("./assets/onion.png"),
   DOT: require("./assets/dot.png"),
   VERIFIED: require("./assets/verified.png"),
   VERTICALDIVIDER: require("./assets/vertdivider.png"),

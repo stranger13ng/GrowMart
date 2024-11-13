@@ -65,15 +65,15 @@ const Home = () => {
     });
   }, [navigation]);
 
-  const onLogoutPress = async () => {
-    try {
-      await logout(); // Call the logout function from AuthContext
-      navigation.navigate("Authorization"); // Navigate to Authorization screen after logout
-      Alert.alert("Logged out successfully");
-    } catch (error) {
-      Alert.alert("Error", "Logout failed, please try again");
-    }
-  };
+  // const onLogoutPress = async () => {
+  //   try {
+  //     await logout(); // Call the logout function from AuthContext
+  //     navigation.navigate("Authorization"); // Navigate to Authorization screen after logout
+  //     Alert.alert("Logged out successfully");
+  //   } catch (error) {
+  //     Alert.alert("Error", "Logout failed, please try again");
+  //   }
+  // };
 
   // Function to fetch products
   const getProducts = async () => {
@@ -92,9 +92,9 @@ const Home = () => {
     getProducts();
   }, []);
 
-  useEffect(() => {
-    console.log("Search query changed:", searchQuery);
-  }, [searchQuery]);
+  // useEffect(() => {
+  //   console.log("Search query changed:", searchQuery);
+  // }, [searchQuery]);
 
   // Filter products based on the search query
   const filteredProducts = searchQuery
