@@ -18,6 +18,7 @@ import Registration from "./Registration/Registration";
 import RgbaColors from "../../RgbaColors";
 import { Tab } from "./Tab";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { showMessage } from "react-native-flash-message";
 
 const AuthComponent = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -33,17 +34,33 @@ const AuthComponent = () => {
 
   const handleLogin = async () => {
     if (!username || !password) {
-      Alert.alert("Error", "Please enter both username and password");
+      showMessage({
+        message: "Заполните все поля",
+        type: "danger",
+        icon: "danger",
+        duration: 3000, // Display for 3 seconds
+      });
       return;
     }
 
     setLoading(true);
     try {
       await login(username, password);
-      Alert.alert("Login Success");
+      showMessage({
+        message: "Выполнен вход в аккаунт",
+        type: "success",
+        icon: "success",
+        duration: 3000, // Display for 3 seconds
+        backgroundColor: "#28a745", // Green color for success
+      });
       // Navigate to Home or wherever
     } catch (error) {
-      Alert.alert("Login Failed", "Invalid credentials");
+      showMessage({
+        message: "Ошибка при входе в аккаунт",
+        type: "danger",
+        icon: "danger",
+        duration: 3000, // Display for 3 seconds
+      });
     } finally {
       setLoading(false);
     }
@@ -58,7 +75,12 @@ const AuthComponent = () => {
       !companyName ||
       !selectedItem
     ) {
-      Alert.alert("Error", "Please fill in all registration fields");
+      showMessage({
+        message: "Заполните все поля",
+        type: "danger",
+        icon: "danger",
+        duration: 3000, // Display for 3 seconds
+      });
 
       return;
     }
@@ -74,10 +96,21 @@ const AuthComponent = () => {
         selectedItem,
         password2
       );
-      Alert.alert("Registration Successful");
+      showMessage({
+        message: "Registration Successful",
+        type: "success",
+        icon: "success",
+        duration: 3000, // Display for 3 seconds
+        backgroundColor: "#28a745", // Green color for success
+      });
       // Navigate to Home or wherever
     } catch (error) {
-      Alert.alert("Registration error");
+      showMessage({
+        message: "Ошибка при создании аккаунта",
+        type: "danger",
+        icon: "danger",
+        duration: 3000, // Display for 3 seconds
+      });
     } finally {
       setLoading(false);
     }

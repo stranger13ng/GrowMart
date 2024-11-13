@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import SelectDropdown from "react-native-select-dropdown";
+import RgbaColors from "../../../RgbaColors";
 
 const Registration = ({
   onChangeText,
@@ -21,6 +22,41 @@ const Registration = ({
     { text: "FZ", title: "ФИЗИЧЕСКОЕ ЛИЦО" },
   ];
   const [step, setStep] = useState(1);
+  const [orgName, setOrgName] = useState();
+
+  function ProceedButtonComponent() {
+    return step == 1 ? (
+      <View style={styles.touchableButton}>
+        <TouchableHighlight
+          style={styles.proceedButton}
+          onPress={handleNextStep}
+        >
+          <Text style={styles.registerButtonText}>Продолжить</Text>
+        </TouchableHighlight>
+      </View>
+    ) : step == 2 ? (
+      <View style={styles.touchableButton}>
+        <TouchableHighlight style={styles.backButton} onPress={handlePrevStep}>
+          <Text style={styles.registerButtonText}>Назад</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.proceedButton}
+          onPress={handleNextStep}
+        >
+          <Text style={styles.registerButtonText}>Продолжить</Text>
+        </TouchableHighlight>
+      </View>
+    ) : (
+      <View style={styles.touchableButton}>
+        <TouchableHighlight style={styles.backButton} onPress={handlePrevStep}>
+          <Text style={styles.registerButtonText}>Назад</Text>
+        </TouchableHighlight>
+        <TouchableHighlight style={styles.proceedButton} onPress={onRegister}>
+          <Text style={styles.registerButtonText}>Зарегистрироваться</Text>
+        </TouchableHighlight>
+      </View>
+    );
+  }
 
   const handleNextStep = () => {
     setStep(step + 1);
@@ -44,55 +80,15 @@ const Registration = ({
             inputMode="numeric"
           />
           <Text
-            style={[{ paddingTop: 16, fontWeight: 700 }, styles.field_heading]}
-          >
-            Фамилия
-          </Text>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={(text) => onChangeText("lastName", text)} // Pass the field name and text
-            autoComplete="lastName"
-          />
-          <Text
-            style={[{ paddingTop: 16, fontWeight: 700 }, styles.field_heading]}
-          >
-            Имя
-          </Text>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={(text) => onChangeText("firstName", text)} // Pass the field name and text
-            autoComplete="firstName"
-          />
-
-          <View style={styles.touchableButton}>
-            <TouchableHighlight
-              style={styles.registerButton}
-              onPress={handleNextStep}
-            >
-              <Text style={styles.registerButtonText}>Продолжить</Text>
-            </TouchableHighlight>
-          </View>
-        </>
-      ) : step === 2 ? (
-        <>
-          <Text style={[{ fontWeight: 700 }, styles.field_heading]}>
-            Наименование Организации
-          </Text>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={(text) => onChangeText("companyName", text)} // New field
-            autoComplete="companyName"
-          />
-          <Text
-            style={[{ paddingTop: 16, fontWeight: 700 }, styles.field_heading]}
+            style={[{ fontWeight: 700, paddingTop: 16 }, styles.field_heading]}
           >
             Тип Юридического Лица
           </Text>
-
           <SelectDropdown
             data={SelectData}
             onSelect={(selectedItem, index) => {
               onSelectedCompany(selectedItem.text);
+              setOrgName(selectedItem.text);
             }}
             renderButton={(selectedItem, isOpened) => {
               return (
@@ -123,24 +119,47 @@ const Registration = ({
             dropdownStyle={styles.dropdownMenuStyle}
           />
 
-          <View style={styles.touchableButton}>
-            <TouchableHighlight
-              style={styles.registerButton}
-              onPress={handleNextStep}
-            >
-              <Text style={styles.registerButtonText}>Продолжить</Text>
-            </TouchableHighlight>
+          <ProceedButtonComponent />
+        </>
+      ) : step === 2 ? (
+        <>
+          {orgName == "FZ" ? (
+            onChangeText("companyName", "Физическое лицо")
+          ) : (
+            <>
+              <Text style={[{ fontWeight: 700 }, styles.field_heading]}>
+                Наименование Организации
+              </Text>
+              <TextInput
+                style={styles.textInput}
+                onChangeText={(text) => onChangeText("companyName", text)} // New field
+                autoComplete="companyName"
+              />
+            </>
+          )}
 
-            <TouchableHighlight
-              style={[
-                styles.registerButton,
-                { marginTop: 10, backgroundColor: "gray" },
-              ]}
-              onPress={handlePrevStep}
-            >
-              <Text style={styles.registerButtonText}>Назад</Text>
-            </TouchableHighlight>
-          </View>
+          <Text
+            style={[{ paddingTop: 16, fontWeight: 700 }, styles.field_heading]}
+          >
+            Фамилия
+          </Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => onChangeText("lastName", text)} // Pass the field name and text
+            autoComplete="lastName"
+          />
+          <Text
+            style={[{ paddingTop: 16, fontWeight: 700 }, styles.field_heading]}
+          >
+            Имя
+          </Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => onChangeText("firstName", text)} // Pass the field name and text
+            autoComplete="firstName"
+          />
+
+          <ProceedButtonComponent />
         </>
       ) : (
         <>
@@ -162,25 +181,7 @@ const Registration = ({
             onChangeText={(text) => onChangePassword(text)}
             secureTextEntry
           />
-
-          <View style={styles.touchableButton}>
-            <TouchableHighlight
-              style={styles.registerButton}
-              onPress={onRegister}
-            >
-              <Text style={styles.registerButtonText}>Зарегистрироваться</Text>
-            </TouchableHighlight>
-
-            <TouchableHighlight
-              style={[
-                styles.registerButton,
-                { marginTop: 10, backgroundColor: "gray" },
-              ]}
-              onPress={handlePrevStep}
-            >
-              <Text style={styles.registerButtonText}>Назад</Text>
-            </TouchableHighlight>
-          </View>
+          <ProceedButtonComponent />
         </>
       )}
     </View>
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
   textInput: {
     borderColor: "black",
     backgroundColor: "rgba(255, 255, 255, 0.07)",
-    borderWidth: 1,
+    // borderWidth: 1,
     width: "100%",
     borderRadius: 50,
     height: 50,
@@ -211,6 +212,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  backButton: {
+    height: 50,
+    flex: 20,
+    backgroundColor: RgbaColors.TERTIARY_TEXT_WHITE,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  proceedButton: {
+    height: 50,
+    flex: 32,
+    backgroundColor: RgbaColors.SECONDARY_PURPLE,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   registerButtonText: {
     color: "white",
     fontSize: 16,
@@ -218,7 +235,10 @@ const styles = StyleSheet.create({
   },
   touchableButton: {
     borderRadius: 50,
-    paddingTop: 20,
+    flex: 1,
+    gap: 5,
+    flexDirection: "row",
+    paddingTop: 45,
   },
   field_heading: {
     color: "white",
