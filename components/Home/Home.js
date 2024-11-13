@@ -30,6 +30,51 @@ const Home = () => {
   const width = Dimensions.get("window").width;
   const iconButtonWidth = (width / 375) * 40;
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => logout()} // Pass ref.current
+          style={{ justifyContent: "center", paddingLeft: 20 }}
+        >
+          <View
+            style={{
+              // flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              // padding: 8,
+              backgroundColor: RgbaColors.PRIMARY_WHITE_BACKGROUND,
+              borderRadius: 100,
+              width: iconButtonWidth,
+              height: iconButtonWidth,
+            }}
+          >
+            <Image
+              source={IMAGES.LOGOUT}
+              resizeMode="contain"
+              style={{
+                width: (iconButtonWidth * 4) / 7,
+                height: (iconButtonWidth * 4) / 7,
+                marginRight: 5,
+                //   tintColor: "black",
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  const onLogoutPress = async () => {
+    try {
+      await logout(); // Call the logout function from AuthContext
+      navigation.navigate("Authorization"); // Navigate to Authorization screen after logout
+      Alert.alert("Logged out successfully");
+    } catch (error) {
+      Alert.alert("Error", "Logout failed, please try again");
+    }
+  };
+
   // Function to fetch products
   const getProducts = async () => {
     try {
