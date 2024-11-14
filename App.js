@@ -5,13 +5,14 @@ import {
   Platform,
   StyleSheet,
   Text,
-  TouchableHighlight,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+  GestureHandlerRootView,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
 import RgbaColors from "./RgbaColors";
 
 // Import components
@@ -24,6 +25,7 @@ import IMAGES from "./Assets";
 import NavigationBarBottom from "./components/Home/NavigationBarBottom";
 import CreateSubsidyFormFields from "./components/SubsidyComponents/CreateSubsidyFormFields";
 import FlashMessage from "react-native-flash-message";
+import { Button } from "@react-navigation/elements";
 
 // Define the stack navigator
 const Stack = createNativeStackNavigator();
@@ -88,7 +90,9 @@ export const Layout = () => {
         style={{ paddingTop: Platform.OS === "ios" ? 10 : 50 }}
       />
       <Stack.Navigator
-        initialRouteName={authState.access ? "Home" : "Authorization"}
+        initialRouteName={
+          authState.access ? "NavigationBarBottom" : "Authorization"
+        }
       >
         {authState.access ? (
           <Stack.Screen
@@ -124,6 +128,9 @@ export const Layout = () => {
                 <HeaderIcon source={IMAGES.BACKBUTTON} />
               </TouchableOpacity>
             ),
+            // headerRight: () => (
+            //   <Button onPress={() => console.log("CLICK")}>Update count</Button>
+            // ),
             // headerRight: () => (
             //   <TouchableOpacity
             //     onPress={childRef.create}

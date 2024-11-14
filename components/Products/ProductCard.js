@@ -8,7 +8,6 @@ const ProductCard = ({ products }) => {
   const windowWidth = Dimensions.get("window").width;
   const cardWidth = (windowWidth - 45) / 2;
   const cardHeight = cardWidth;
-  console.log(products);
   return (
     <View style={{ flex: 1, paddingTop: 5 }}>
       {products.length === 0 ? (

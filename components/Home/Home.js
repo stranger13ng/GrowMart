@@ -1,4 +1,3 @@
-// Home.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -16,19 +15,25 @@ import ProductCard from "../Products/ProductCard";
 import SearchBarComponent from "../SearchBarComponent";
 import IMAGES from "../../Assets";
 import ScrollViewCarousel from "../ScrollViewCarousel";
+import RgbaColors from "../../RgbaColors"; // Importing RgbaColors
 import {
   fetchProducts,
   fetchProductsTypes,
 } from "../../src/services/ProductService";
+import mockProducts from "../Products/mockProducts";
 
 const Home = () => {
   const [products, setProducts] = useState([]); // State to store all products
   const [searchQuery, setSearchQuery] = useState(""); // State to store search query
-
   const navigation = useNavigation();
   const { logout, getAuthToken } = useAuth();
   const width = Dimensions.get("window").width;
   const iconButtonWidth = (width / 375) * 40;
+
+  // Set products initially to mock data
+  useEffect(() => {
+    setProducts(mockProducts);
+  }, []);
 
   useEffect(() => {
     navigation.setOptions({
@@ -39,10 +44,8 @@ const Home = () => {
         >
           <View
             style={{
-              // flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              // padding: 8,
               backgroundColor: RgbaColors.PRIMARY_WHITE_BACKGROUND,
               borderRadius: 100,
               width: iconButtonWidth,
@@ -56,7 +59,6 @@ const Home = () => {
                 width: (iconButtonWidth * 4) / 7,
                 height: (iconButtonWidth * 4) / 7,
                 marginRight: 5,
-                //   tintColor: "black",
               }}
             />
           </View>
@@ -65,43 +67,24 @@ const Home = () => {
     });
   }, [navigation]);
 
-  // const onLogoutPress = async () => {
+  // Uncomment and adjust the getProducts function if you need to fetch real data
+  // const getProducts = async () => {
   //   try {
-  //     await logout(); // Call the logout function from AuthContext
-  //     navigation.navigate("Authorization"); // Navigate to Authorization screen after logout
-  //     Alert.alert("Logged out successfully");
+  //     const token = await getAuthToken();
+  //     const fetchedProducts = await fetchProductsTypes(token);
+  //     setProducts(fetchedProducts);
   //   } catch (error) {
-  //     Alert.alert("Error", "Logout failed, please try again");
+  //     console.error("Error fetching products:", error);
+  //     Alert.alert("Error", "Failed to fetch products. Please try again.");
   //   }
   // };
-
-  // Function to fetch products
-  const getProducts = async () => {
-    try {
-      const token = await getAuthToken();
-      const fetchedProducts = await fetchProductsTypes(token);
-      setProducts(fetchedProducts);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      Alert.alert("Error", "Failed to fetch products. Please try again.");
-    }
-  };
-
-  // Fetch products when component mounts
-  useEffect(() => {
-    getProducts();
-  }, []);
-
-  // useEffect(() => {
-  //   console.log("Search query changed:", searchQuery);
-  // }, [searchQuery]);
 
   // Filter products based on the search query
   const filteredProducts = searchQuery
     ? products.filter((product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : products; // Show all products if search query is empty
+    : products;
 
   return (
     <ScrollView

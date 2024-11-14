@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import {
-  View,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
+import { View, Image, TextInput, Dimensions } from "react-native";
 import PropTypes from "prop-types";
 import IMAGES from "../Assets";
 import RgbaColors from "../RgbaColors";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const SearchBarComponent = ({ onChangeText }) => {
   const windowHeight = Dimensions.get("window").height;
@@ -42,8 +37,12 @@ const SearchBarComponent = ({ onChangeText }) => {
           placeholderTextColor={RgbaColors.SECONDARY_TEXT_WHITE}
           style={styles.searchInput}
         />
-        {searchQuery != "" && (
-          <TouchableOpacity>
+        {searchQuery != null && searchQuery != "" && (
+          <TouchableOpacity
+            onPress={() => {
+              handleInputChange(null);
+            }}
+          >
             <Image source={IMAGES.CROSS} style={styles.crossIcon} />
           </TouchableOpacity>
         )}
@@ -122,9 +121,12 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 32,
+    // gap: 12,
   },
   iconWrapper: {
-    flex: 1,
+    // flex: 1,
+    height: 42,
+    width: 42,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 32,

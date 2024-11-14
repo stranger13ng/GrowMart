@@ -49,7 +49,6 @@ const ProfileMain = () => {
       const token = await getAuthToken();
       const fieldDataList = await fetchFieldslist(token);
       const regionList = await fetchRegionlist(token);
-      console.log(fieldDataList);
       setFieldData(fieldDataList);
       setLegionList(regionList);
     } catch (error) {
@@ -69,7 +68,6 @@ const ProfileMain = () => {
     try {
       const token = await getAuthToken();
       const productDataList = await fetchProductlist(token);
-      console.log(productDataList);
       setProductData(productDataList);
     } catch (error) {
       console.log(error);
@@ -88,7 +86,6 @@ const ProfileMain = () => {
     try {
       const token = await getAuthToken(); // Get the token from AuthContext
       const fetchedProfile = await fetchUserProfile(token); // Call the service to fetch the profile
-      console.log(fetchedProfile);
       setProfile(fetchedProfile);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -284,7 +281,6 @@ const ProfileMain = () => {
                         key={index}
                         onPress={() => {
                           handlePress(index, item);
-                          console.log("ITEM LOG", item);
                         }}
                       >
                         <FieldCard

@@ -41,8 +41,6 @@ export const FieldCard = ({ data, productData, style }) => {
   const matchedType = typesList.find(
     (type) => type.id === matchedProduct?.type
   );
-  console.log("MATCHPRODUCT: ", matchedProduct);
-  console.log("MATCH: ", matchedType);
 
   return (
     <View

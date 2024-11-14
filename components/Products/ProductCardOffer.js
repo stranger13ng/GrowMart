@@ -13,7 +13,7 @@ const ProductCardOffer = ({
   pricePerKg,
 }) => {
   const handlePin = () => {
-    console.log("PIN Button was pressed");
+    // console.log("PIN Button was pressed");
   };
 
   return (

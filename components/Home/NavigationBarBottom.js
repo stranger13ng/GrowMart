@@ -100,11 +100,11 @@ const NavigationBarBottom = () => {
           headerShadowVisible: false,
           headerTitleAlign: "center",
           // headerLeft: () => <HeaderIcon source={IMAGES.BELL} />,
-          headerLeft: () => (
-            <View style={{ paddingLeft: horizontalPadding }}>
-              <HeaderIcon source={IMAGES.BELL} />
-            </View>
-          ),
+          // headerLeft: () => (
+          //   <View style={{ paddingLeft: horizontalPadding }}>
+          //     <HeaderIcon source={IMAGES.BELL} />
+          //   </View>
+          // ),
           // headerRight: () => <HeaderIcon source={IMAGES.CART} />,
           headerRight: () => (
             <View style={{ paddingRight: horizontalPadding }}>
@@ -131,6 +131,7 @@ const NavigationBarBottom = () => {
           headerShown: true,
           headerTitle: LogoTitle,
           headerTitleAlign: "center",
+
           // headerLeft: () => <HeaderIcon source={IMAGES.BELL} />,
           headerLeft: () => (
             <View style={{ paddingLeft: horizontalPadding }}>

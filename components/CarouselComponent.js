@@ -55,7 +55,7 @@ function CarouselComponent() {
         pagingEnabled={Platform.OS === "ios" ? false : true} // Helps with smooth scrolling on Android
         data={data}
         style={{ width: "100%" }}
-        onSnapToItem={(index) => console.log("current index:", index)}
+        // onSnapToItem={(index) => console.log("current index:", index)}
         renderItem={({ item }) => (
           <View style={[styles.itemContainer, { backgroundColor: item.color }]}>
             <Image source={IMAGES.HOMEILLUSTRATION1} resizeMode="contain" />

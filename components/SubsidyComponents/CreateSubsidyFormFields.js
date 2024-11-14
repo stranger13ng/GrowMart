@@ -14,7 +14,6 @@ import {
   Image,
   ScrollView,
   Platform,
-  TouchableOpacity,
 } from "react-native";
 import RgbaColors from "../../RgbaColors";
 import IMAGES from "../../Assets";
@@ -29,13 +28,16 @@ import {
 } from "../../src/services/UserProfileService";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { showMessage } from "react-native-flash-message";
+import { Button } from "@react-navigation/elements";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const screenWidth = Dimensions.get("window").width;
 
 const CreateSubsidyFormFields = () => {
   const route = useRoute();
   const { user } = route.params;
-  const formDataRef = useRef(formData); // Create a ref to track formData
+  // const formDataRef = useRef(formData); // Create a ref to track formData
+  const formDataRef = useRef(null);
 
   const [formData, setFormData] = useState({
     city: "",
@@ -58,7 +60,6 @@ const CreateSubsidyFormFields = () => {
       ...prevState,
       [key]: value,
     }));
-    // console.log("Form Data Updated:", formData);
   };
   useEffect(() => {
     formDataRef.current = formData;
@@ -81,6 +82,19 @@ const CreateSubsidyFormFields = () => {
           </Text>
         </TouchableOpacity>
       ),
+      // headerLeft: () => (
+      //   <TouchableOpacity
+      //     onPress={() => handleFieldCreation(formDataRef.current)} // Pass ref.current
+      //     style={{
+      //       backgroundColor: RgbaColors.PRIMARY_PURPLE,
+      //       paddingHorizontal: 20,
+      //       paddingVertical: 10,
+      //       borderRadius: 25,
+      //     }}
+      //   >
+      //     <Image source={IMAGES.LOGOUT} />
+      //   </TouchableOpacity>
+      // ),
     });
   }, [navigation]);
   const [loading, setLoading] = useState(false);
@@ -122,7 +136,6 @@ const CreateSubsidyFormFields = () => {
       fraction,
       user,
     } = formData;
-    console.log("Form Data Inside Creation:", formData);
     const requiredFields = [
       city,
       region,
@@ -137,7 +150,6 @@ const CreateSubsidyFormFields = () => {
       fraction,
       user,
     ];
-    console.log(requiredFields);
     // Validate if all required fields are filled and user is defined
     if (!user) {
       showMessage({
@@ -441,6 +453,42 @@ const CreateSubsidyFormFields = () => {
           image={IMAGES.DROPDOWNICON}
           selectData={SelectFractionDropdown}
         />
+        {/* <View style={{ flexDirection: "row", flex: 1 }}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()} // Pass ref.current
+            style={{
+              backgroundColor: RgbaColors.TERTIARY_TEXT_WHITE,
+              marginHorizontal: 20,
+              paddingHorizontal: 20,
+              paddingVertical: 10,
+              borderRadius: 25,
+              flex: 20,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 16, color: "white", fontWeight: 600 }}>
+              Отмена
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleFieldCreation(formData)} // Pass ref.current
+            style={{
+              backgroundColor: RgbaColors.PRIMARY_PURPLE,
+              marginHorizontal: 20,
+              paddingHorizontal: 20,
+              paddingVertical: 10,
+              borderRadius: 25,
+              flex: 32,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 16, color: "white", fontWeight: 600 }}>
+              Создать
+            </Text>
+          </TouchableOpacity>
+        </View> */}
       </View>
 
       <View style={{ height: 100 }} />

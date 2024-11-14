@@ -209,7 +209,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     const accessToken = await AsyncStorage.getItem("useraccess"); // Check AsyncStorage
-    console.log(accessToken);
     return accessToken;
   };
 
